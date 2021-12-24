@@ -36,6 +36,13 @@ namespace CSAEngine
         public const int LOCATION_ID_FARM_FIELD = 7;
         public const int LOCATION_ID_BRIDGE = 8;
         public const int LOCATION_ID_SPIDER_FIELD = 9;
+        static World()
+        {
+            PopulateItems();
+            PopulateLocations();
+            PopulateMonsters();
+            PopulateQuests();
+        }
         
         private static void PopulateItems()
         {
