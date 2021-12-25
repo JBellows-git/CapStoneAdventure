@@ -22,14 +22,15 @@ namespace CapStoneAdventure
         {   
             InitializeComponent();
 
-            _player = new Player(10,10,20,0,1);
+            _player = new Player(10,10,20,0,100,1);
             MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
-            _player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_RUSTY_SWORD), 1));
+            _player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_CLUB), 1));
 
 
             lblHitPoints.Text = _player.CurrentHitPoints.ToString();
             lblGold.Text = _player.Gold.ToString();
             lblExperience.Text = _player.ExperiencePoints.ToString();
+            lblExperienceNeededToLevel.Text = _player.ExpNeededToLevel.ToString();
             lblLevel.Text = _player.Level.ToString();
         }
 
@@ -59,7 +60,8 @@ namespace CapStoneAdventure
             //if an item is required to enter new square
             if (!_player.HasRequiredItemtoEnterLocation(newLocation))
             {
-                rtbLocation.Text += "You must have a " + newLocation.ItemRequiredToEnter.Name + " to enter this location." + Environment.NewLine;
+                rtbMessages.Text += "You must have a " + newLocation.ItemRequiredToEnter.Name + " to enter this location." + Environment.NewLine;
+                ScrollToBottom();
                 return;
             }
 
@@ -73,7 +75,8 @@ namespace CapStoneAdventure
 
             //display location name and description
             rtbLocation.Text = newLocation.Name + Environment.NewLine;
-            rtbLocation.Text = newLocation.Description + Environment.NewLine;
+            rtbMessages.Text += newLocation.Description + Environment.NewLine;
+            ScrollToBottom();
 
             //heal player - to be removed later
             _player.CurrentHitPoints = _player.MaximumHitPoints;
@@ -103,8 +106,15 @@ namespace CapStoneAdventure
                             rtbMessages.Text += newLocation.QuestAvailableHere.RewardExperiencePoints.ToString() + " experience points" + Environment.NewLine;
                             rtbMessages.Text += newLocation.QuestAvailableHere.RewardGold.ToString() + " gold" + Environment.NewLine;
                             rtbMessages.Text += newLocation.QuestAvailableHere.RewardItem.ToString() + Environment.NewLine;
+                            ScrollToBottom();
 
                             _player.ExperiencePoints += newLocation.QuestAvailableHere.RewardExperiencePoints;
+                            if (_player.ExperiencePoints >= _player.ExpNeededToLevel)
+                            {
+                                _player.LevelUp(_player.ExpNeededToLevel);
+                                lblExperienceNeededToLevel.Text = _player.ExpNeededToLevel.ToString();
+                                rtbMessages.Text += "You leveled up! Your Max HitPoints are now " + _player.MaximumHitPoints.ToString() + ".";
+                            }
                             _player.Gold += newLocation.QuestAvailableHere.RewardGold;
 
                             //add reward item to inventory
@@ -123,9 +133,9 @@ namespace CapStoneAdventure
                     //display quest message
                     rtbMessages.Text += "You received the '" + newLocation.QuestAvailableHere.Name + "' quest." + Environment.NewLine;
                     rtbMessages.Text += newLocation.QuestAvailableHere.Description + Environment.NewLine;
-                    rtbMessages.Text += "To complete it, return with: " + Environment.NewLine;
+                    rtbMessages.Text += "To complete it, return with: " + Environment.NewLine;                    
 
-                    foreach(QuestCompletionItem qci in newLocation.QuestAvailableHere.QuestCompletionItems)
+                    foreach (QuestCompletionItem qci in newLocation.QuestAvailableHere.QuestCompletionItems)
                     {
                         if(qci.Quantity == 1)
                         {
@@ -137,6 +147,7 @@ namespace CapStoneAdventure
                         }
                     }
                     rtbMessages.Text += Environment.NewLine;
+                    ScrollToBottom();
 
                     //add quest to questList
                     _player.Quests.Add(new PlayerQuest(newLocation.QuestAvailableHere));
@@ -147,6 +158,7 @@ namespace CapStoneAdventure
             if(newLocation.MonsterLivingHere != null)
             {
                 rtbMessages.Text += "You see a " + newLocation.MonsterLivingHere.Name + Environment.NewLine;
+                ScrollToBottom();
 
                 //make a monster from world.monster list
                 Monster standardMonster = World.MonsterByID(newLocation.MonsterLivingHere.ID);
@@ -296,9 +308,10 @@ namespace CapStoneAdventure
 
             //display message
             rtbMessages.Text += "You hit the " + _currentMonster.Name + " for " + damageToMonster.ToString() + " points." + Environment.NewLine;
+            ScrollToBottom();
 
             //Check if the monster is dead
-            if(_currentMonster.CurrentHitPoints <= 0)
+            if (_currentMonster.CurrentHitPoints <= 0)
             {
                 //Monster is dead
                 rtbMessages.Text += Environment.NewLine +"You defeated the " + _currentMonster.Name + Environment.NewLine;
@@ -307,7 +320,14 @@ namespace CapStoneAdventure
                 _player.ExperiencePoints += _currentMonster.RewardExperiencePoints;
                 rtbMessages.Text += "You receive " + _currentMonster.RewardExperiencePoints.ToString() + " experience points," + Environment.NewLine;
                 _player.Gold += _currentMonster.RewardGold;
-                rtbMessages.Text += "and " + _currentMonster.RewardGold.ToString() + " gold.";
+                rtbMessages.Text += "and " + _currentMonster.RewardGold.ToString() + " gold." + Environment.NewLine;
+                if(_player.ExperiencePoints >= _player.ExpNeededToLevel)
+                {
+                    _player.LevelUp(_player.ExpNeededToLevel);
+                    lblExperienceNeededToLevel.Text = _player.ExpNeededToLevel.ToString();
+                    rtbMessages.Text += "You leveled up! Your Max HitPoints are now " + _player.MaximumHitPoints.ToString() + ".";
+                }
+                ScrollToBottom();
 
                 List<InventoryItem> loot = new List<InventoryItem>();
                 foreach(LootItem lootItem in _currentMonster.LootTable)
@@ -353,6 +373,7 @@ namespace CapStoneAdventure
                 UpdatePotionListUI();
 
                 rtbMessages.Text += Environment.NewLine;
+                ScrollToBottom();
                 MoveTo(_player.CurrentLocation);
             }
             else
@@ -368,6 +389,7 @@ namespace CapStoneAdventure
                     rtbMessages.Text += "The " + _currentMonster.Name + " killed you." + Environment.NewLine;
                     MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
                 }
+                ScrollToBottom();
             }
         }
 
@@ -406,11 +428,18 @@ namespace CapStoneAdventure
                 rtbMessages.Text += "The " + _currentMonster.Name + " killed you." + Environment.NewLine;
                 MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
             }
+            ScrollToBottom();
 
             //refresh player data in UI
             lblHitPoints.Text = _player.CurrentHitPoints.ToString();
             UpdateInventoryListUI();
             UpdatePotionListUI();
+        }
+
+        private void ScrollToBottom()
+        {
+            rtbMessages.SelectionStart = rtbMessages.Text.Length;
+            rtbMessages.ScrollToCaret();
         }
     }
 }

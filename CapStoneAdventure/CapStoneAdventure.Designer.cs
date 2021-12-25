@@ -50,6 +50,8 @@ namespace CapStoneAdventure
             this.rtbMessages = new System.Windows.Forms.RichTextBox();
             this.dgvInventory = new System.Windows.Forms.DataGridView();
             this.dgvQuests = new System.Windows.Forms.DataGridView();
+            this.label6 = new System.Windows.Forms.Label();
+            this.lblExperienceNeededToLevel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvInventory)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvQuests)).BeginInit();
             this.SuspendLayout();
@@ -108,11 +110,12 @@ namespace CapStoneAdventure
             // 
             // lblExperience
             // 
-            this.lblExperience.AutoSize = true;
-            this.lblExperience.Location = new System.Drawing.Point(110, 73);
+            this.lblExperience.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.lblExperience.Location = new System.Drawing.Point(87, 73);
             this.lblExperience.Name = "lblExperience";
-            this.lblExperience.Size = new System.Drawing.Size(0, 13);
+            this.lblExperience.Size = new System.Drawing.Size(40, 13);
             this.lblExperience.TabIndex = 6;
+            this.lblExperience.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // lblLevel
             // 
@@ -257,11 +260,32 @@ namespace CapStoneAdventure
             this.dgvQuests.Size = new System.Drawing.Size(312, 189);
             this.dgvQuests.TabIndex = 20;
             // 
+            // label6
+            // 
+            this.label6.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(129, 73);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(12, 13);
+            this.label6.TabIndex = 21;
+            this.label6.Text = "/";
+            // 
+            // lblExperienceNeededToLevel
+            // 
+            this.lblExperienceNeededToLevel.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.lblExperienceNeededToLevel.AutoSize = true;
+            this.lblExperienceNeededToLevel.Location = new System.Drawing.Point(145, 73);
+            this.lblExperienceNeededToLevel.Name = "lblExperienceNeededToLevel";
+            this.lblExperienceNeededToLevel.Size = new System.Drawing.Size(0, 13);
+            this.lblExperienceNeededToLevel.TabIndex = 22;
+            // 
             // CapStoneAdventure
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(719, 651);
+            this.Controls.Add(this.lblExperienceNeededToLevel);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.dgvQuests);
             this.Controls.Add(this.dgvInventory);
             this.Controls.Add(this.rtbMessages);
@@ -315,6 +339,8 @@ namespace CapStoneAdventure
         private System.Windows.Forms.RichTextBox rtbMessages;
         private System.Windows.Forms.DataGridView dgvInventory;
         private System.Windows.Forms.DataGridView dgvQuests;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label lblExperienceNeededToLevel;
     }
 }
 

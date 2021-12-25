@@ -38,10 +38,10 @@ namespace CSAEngine
         public const int LOCATION_ID_SPIDER_FIELD = 9;
         static World()
         {
-            PopulateItems();
-            PopulateLocations();
+            PopulateItems();            
             PopulateMonsters();
             PopulateQuests();
+            PopulateLocations();
         }
         
         private static void PopulateItems()
@@ -59,7 +59,7 @@ namespace CSAEngine
         }
         private static void PopulateMonsters()
         {
-            Monster rat = new Monster(MONSTER_ID_RAT, "Rat", 5, 3, 10, 3, 3);
+            Monster rat = new Monster(MONSTER_ID_RAT, "Rat", 5, 50, 10, 3, 3);
             rat.LootTable.Add(new LootItem(ItemByID(ITEM_ID_RAT_TAIL), 75, false));
             rat.LootTable.Add(new LootItem(ItemByID(ITEM_ID_PIECE_OF_FUR), 75, true));
             Monster snake = new Monster(MONSTER_ID_SNAKE, "Snake", 5, 3, 10, 3, 3);
