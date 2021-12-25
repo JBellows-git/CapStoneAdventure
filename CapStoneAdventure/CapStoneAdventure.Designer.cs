@@ -309,6 +309,7 @@ namespace CapStoneAdventure
             this.Controls.Add(this.label1);
             this.Name = "CapStoneAdventure";
             this.Text = "Cap Stone Adventure";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.CapStoneAdventure_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.dgvInventory)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvQuests)).EndInit();
             this.ResumeLayout(false);
