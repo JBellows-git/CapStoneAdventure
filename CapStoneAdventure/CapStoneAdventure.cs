@@ -33,8 +33,14 @@ namespace CapStoneAdventure
                 _player = Player.CreateDefaultPlayer();
             }
 
+            lblHitPoints.DataBindings.Add("Text", _player, "CurrentHitPoints");
+            lblGold.DataBindings.Add("Text", _player, "Gold");
+            lblExperience.DataBindings.Add("Text", _player, "ExperiencePoints");
+            lblExperienceNeededToLevel.DataBindings.Add("Text", _player, "ExpNeededToLevel");
+            lblLevel.DataBindings.Add("Text", _player, "Level");
+
             MoveTo(_player.CurrentLocation);
-            UpdatePlayerStats();
+            
         }
 
         
@@ -116,8 +122,7 @@ namespace CapStoneAdventure
                             _player.ExperiencePoints += newLocation.QuestAvailableHere.RewardExperiencePoints;
                             if (_player.ExperiencePoints >= _player.ExpNeededToLevel)
                             {
-                                _player.LevelUp(_player.ExpNeededToLevel);
-                                lblExperienceNeededToLevel.Text = _player.ExpNeededToLevel.ToString();
+                                _player.LevelUp(_player.ExpNeededToLevel);                                
                                 rtbMessages.Text += "You leveled up! Your Max HitPoints are now " + _player.MaximumHitPoints.ToString() + ".";
                             }
                             _player.Gold += newLocation.QuestAvailableHere.RewardGold;
@@ -192,9 +197,6 @@ namespace CapStoneAdventure
                 btnUsePotion.Visible = false;
             }
 
-            //refresh player info
-            UpdatePlayerStats();
-
             //refresh inventory
             UpdateInventoryListUI();
 
@@ -267,10 +269,20 @@ namespace CapStoneAdventure
             }
             else
             {
+                cboWeapons.SelectedIndexChanged -= cboWeapons_SelectedIndexChanged;
                 cboWeapons.DataSource = weapons;
+                cboWeapons.SelectedIndexChanged += cboWeapons_SelectedIndexChanged;
                 cboWeapons.DisplayMember = "Name";
                 cboWeapons.ValueMember = "ID";
-                cboWeapons.SelectedIndex = 0;
+
+                if (_player.CurrentWeapon != null)
+                {
+                    cboWeapons.SelectedItem = _player.CurrentWeapon;
+                }
+                else
+                {
+                    cboWeapons.SelectedIndex = 0;
+                }
             }
         }
 
@@ -331,8 +343,7 @@ namespace CapStoneAdventure
                 rtbMessages.Text += "and " + _currentMonster.RewardGold.ToString() + " gold." + Environment.NewLine;
                 if(_player.ExperiencePoints >= _player.ExpNeededToLevel)
                 {
-                    _player.LevelUp(_player.ExpNeededToLevel);
-                    lblExperienceNeededToLevel.Text = _player.ExpNeededToLevel.ToString();
+                    _player.LevelUp(_player.ExpNeededToLevel);                
                     rtbMessages.Text += "You leveled up! Your Max HitPoints are now " + _player.MaximumHitPoints.ToString() + ".";
                 }
                 ScrollToBottom();
@@ -370,13 +381,7 @@ namespace CapStoneAdventure
                         rtbMessages.Text += "You loot " + inventoryItem.Quantity.ToString() + " " + inventoryItem.Details.NamePlural + Environment.NewLine;
                     }
                 }
-
-                lblHitPoints.Text = _player.CurrentHitPoints.ToString();
-                lblGold.Text = _player.Gold.ToString();
-                lblExperience.Text = _player.ExperiencePoints.ToString();
-                lblLevel.Text = _player.Level.ToString();
-
-                UpdatePlayerStats();
+                
                 UpdateInventoryListUI();
                 UpdateWeaponListUI();
                 UpdatePotionListUI();
@@ -390,8 +395,7 @@ namespace CapStoneAdventure
                 //Monster is still alive
                 int damageToPlayer = RandomNumberGenerator.NumberBetween(0, _currentMonster.MaximumDamage);
                 rtbMessages.Text += "The " + _currentMonster.Name + " did " + damageToPlayer.ToString() + " points of damage." + Environment.NewLine;
-                _player.CurrentHitPoints -= damageToPlayer;
-                lblHitPoints.Text = _player.CurrentHitPoints.ToString();
+                _player.CurrentHitPoints -= damageToPlayer;                
 
                 if(_player.CurrentHitPoints <= 0)
                 {
@@ -439,8 +443,7 @@ namespace CapStoneAdventure
             }
             ScrollToBottom();
 
-            //refresh player data in UI
-            lblHitPoints.Text = _player.CurrentHitPoints.ToString();
+            //refresh player data in UI            
             UpdateInventoryListUI();
             UpdatePotionListUI();
         }
@@ -449,20 +452,16 @@ namespace CapStoneAdventure
         {
             rtbMessages.SelectionStart = rtbMessages.Text.Length;
             rtbMessages.ScrollToCaret();
-        }
-
-        private void UpdatePlayerStats()
-        {
-            lblHitPoints.Text = _player.CurrentHitPoints.ToString();
-            lblGold.Text = _player.Gold.ToString();
-            lblExperience.Text = _player.ExperiencePoints.ToString();
-            lblExperienceNeededToLevel.Text = _player.ExpNeededToLevel.ToString();
-            lblLevel.Text = _player.Level.ToString();
-        }
+        }       
 
         private void CapStoneAdventure_FormClosing(object sender, FormClosingEventArgs e)
         {
             File.WriteAllText(PLAYER_DATA_FILE_NAME, _player.ToXmlString());
+        }
+
+        private void cboWeapons_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _player.CurrentWeapon = (Weapon)cboWeapons.SelectedItem;
         }
     }
 }

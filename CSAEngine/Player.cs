@@ -8,11 +8,57 @@ using System.Xml;
 namespace CSAEngine
 {
     public class Player : Creature
-    {        
-        public int Gold { get; set; }
-        public int ExperiencePoints { get; set; }
-        public int ExpNeededToLevel { get; set; }
-        public int Level { get; set; }
+    {
+        //public int Gold { get; set; }
+        //public int ExperiencePoints { get; set; }
+        //public int ExpNeededToLevel { get; set; }
+        //public int Level { get; set; }
+        private int _gold;
+        private int _experiencePoints;
+        private int _expNeededToLevel;
+        private int _level;
+
+        public int Gold
+        {
+            get { return _gold; }
+            set
+            {
+                _gold = value;
+                OnPropertyChanged("Gold");
+            }
+        }
+
+        public int ExperiencePoints
+        {
+            get { return _experiencePoints; }
+            set
+            {
+                _experiencePoints = value;
+                OnPropertyChanged("ExperiencePoints");
+            }
+        }
+
+        public int ExpNeededToLevel
+        {
+            get { return _expNeededToLevel; }
+            set
+            {
+                _expNeededToLevel = value;
+                OnPropertyChanged("ExpNeededToLevel");
+            }
+        }
+        
+        public int Level
+        {
+            get { return _level; }
+            set
+            {
+                _level = value;
+                OnPropertyChanged("Level");
+            }
+        }
+
+        public Weapon CurrentWeapon { get; set; }
         public Location CurrentLocation { get; set; }
         public List<InventoryItem> Inventory { get; set; }
         public List<PlayerQuest> Quests { get; set; }
@@ -53,6 +99,12 @@ namespace CSAEngine
                 int level = Convert.ToInt32(playerData.SelectSingleNode("/Player/Stats/Level").InnerText);
 
                 Player player = new Player(currentHitPoints, maximumHitPoints, gold, experiencePoints, expNeededToLevel, level);
+
+                if(playerData.SelectSingleNode("/Player/Stats/CurrentWeapon") != null)
+                {
+                    int currentWeaponID = Convert.ToInt32(playerData.SelectSingleNode("/Player/Stats/CurrentWeapon"));
+                    player.CurrentWeapon = (Weapon)World.ItemByID(currentWeaponID);
+                }
 
                 int currentLocationID = Convert.ToInt32(playerData.SelectSingleNode("/Player/Stats/CurrentLocation").InnerText);
                 player.CurrentLocation = World.LocationByID(currentLocationID);
@@ -119,7 +171,7 @@ namespace CSAEngine
 
             foreach(QuestCompletionItem qci in quest.QuestCompletionItems)
             {
-                if (!Inventory.Exists(ii => ii.Details.ID == qci.Details.ID && ii.Quantity == qci.Quantity))
+                if (!Inventory.Exists(ii => ii.Details.ID == qci.Details.ID && ii.Quantity >= qci.Quantity))
                 {
                     return false;
                 }
@@ -202,6 +254,13 @@ namespace CSAEngine
             XmlNode level = playerData.CreateElement("Level");
             level.AppendChild(playerData.CreateTextNode(this.Level.ToString()));
             stats.AppendChild(level);
+
+            if (CurrentWeapon != null)
+            {
+                XmlNode currentWeapon = playerData.CreateElement("CurrentWeapon");
+                currentWeapon.AppendChild(playerData.CreateTextNode(this.CurrentWeapon.ID.ToString()));
+                stats.AppendChild(currentWeapon);
+            }
 
             XmlNode currentLocation = playerData.CreateElement("CurrentLocation");
             currentLocation.AppendChild(playerData.CreateTextNode(this.CurrentLocation.ID.ToString()));
