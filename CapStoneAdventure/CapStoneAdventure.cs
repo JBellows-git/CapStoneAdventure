@@ -39,6 +39,23 @@ namespace CapStoneAdventure
             lblExperienceNeededToLevel.DataBindings.Add("Text", _player, "ExpNeededToLevel");
             lblLevel.DataBindings.Add("Text", _player, "Level");
 
+            dgvInventory.RowHeadersVisible = false;
+            dgvInventory.AutoGenerateColumns = false;
+
+            dgvInventory.DataSource = _player.Inventory;
+            dgvInventory.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                HeaderText = "Name",
+                Width = 197,
+                DataPropertyName = "Description"
+            });
+
+            dgvInventory.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                HeaderText = "Quantity",
+                DataPropertyName = "Quantity"
+            });
+
             MoveTo(_player.CurrentLocation);
             
         }
@@ -85,7 +102,7 @@ namespace CapStoneAdventure
             btnWest.Visible = (newLocation.LocationToWest != null);
 
             //display location name and description
-            rtbLocation.Text = newLocation.Name + Environment.NewLine;
+            rtbLocation.Text = newLocation.Name;
             rtbMessages.Text += newLocation.Description + Environment.NewLine;
             ScrollToBottom();
 
@@ -195,10 +212,7 @@ namespace CapStoneAdventure
                 cboPotions.Visible = false;
                 btnUseWeapon.Visible = false;
                 btnUsePotion.Visible = false;
-            }
-
-            //refresh inventory
-            UpdateInventoryListUI();
+            }           
 
             //refresh quest list
             UpdateQuestListUI();
@@ -209,26 +223,7 @@ namespace CapStoneAdventure
             //refresh potion combobox
             UpdatePotionListUI();
         }
-
-        private void UpdateInventoryListUI()
-        {
-            dgvInventory.RowHeadersVisible = false;
-
-            dgvInventory.ColumnCount = 2;
-            dgvInventory.Columns[0].Name = "Name";
-            dgvInventory.Columns[0].Width = 197;
-            dgvInventory.Columns[1].Name = "Quantity";
-
-            dgvInventory.Rows.Clear();
-
-            foreach (InventoryItem invItem in _player.Inventory)
-            {
-                if (invItem.Quantity > 0)
-                {
-                    dgvInventory.Rows.Add(new[] { invItem.Details.Name, invItem.Quantity.ToString() });
-                }
-            }
-        }
+        
 
         private void UpdateQuestListUI()
         {
@@ -380,9 +375,8 @@ namespace CapStoneAdventure
                     {
                         rtbMessages.Text += "You loot " + inventoryItem.Quantity.ToString() + " " + inventoryItem.Details.NamePlural + Environment.NewLine;
                     }
-                }
+                }                
                 
-                UpdateInventoryListUI();
                 UpdateWeaponListUI();
                 UpdatePotionListUI();
 
@@ -443,8 +437,7 @@ namespace CapStoneAdventure
             }
             ScrollToBottom();
 
-            //refresh player data in UI            
-            UpdateInventoryListUI();
+            //refresh player data in UI                        
             UpdatePotionListUI();
         }
 

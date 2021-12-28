@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.ComponentModel;
 
 namespace CSAEngine
 {
@@ -60,8 +61,8 @@ namespace CSAEngine
 
         public Weapon CurrentWeapon { get; set; }
         public Location CurrentLocation { get; set; }
-        public List<InventoryItem> Inventory { get; set; }
-        public List<PlayerQuest> Quests { get; set; }
+        public BindingList<InventoryItem> Inventory { get; set; }
+        public BindingList<PlayerQuest> Quests { get; set; }
 
         private Player(int currentHitPoints, int maximumHitPoints, int gold, int experiencePoints, int expNeededToLevel, int level) : base(currentHitPoints, maximumHitPoints)
         {            
@@ -69,8 +70,8 @@ namespace CSAEngine
             ExperiencePoints = experiencePoints;
             ExpNeededToLevel = expNeededToLevel;
             Level = level;
-            Inventory = new List<InventoryItem>();
-            Quests = new List<PlayerQuest>();
+            Inventory = new BindingList<InventoryItem>();
+            Quests = new BindingList<PlayerQuest>();
         }
 
         public static Player CreateDefaultPlayer()
@@ -145,12 +146,12 @@ namespace CSAEngine
                 return true;
             }
             
-            return Inventory.Exists(ii => ii.Details.ID == location.ItemRequiredToEnter.ID);
+            return Inventory.Any(ii => ii.Details.ID == location.ItemRequiredToEnter.ID);
         }
 
         public bool HasThisQuest(Quest quest)
         {
-            return Quests.Exists(pq => pq.Details.ID == quest.ID);
+            return Quests.Any(pq => pq.Details.ID == quest.ID);
         }
 
         public bool CompletedThisQuest(Quest quest)
@@ -171,7 +172,7 @@ namespace CSAEngine
 
             foreach(QuestCompletionItem qci in quest.QuestCompletionItems)
             {
-                if (!Inventory.Exists(ii => ii.Details.ID == qci.Details.ID && ii.Quantity >= qci.Quantity))
+                if (!Inventory.Any(ii => ii.Details.ID == qci.Details.ID && ii.Quantity >= qci.Quantity))
                 {
                     return false;
                 }
