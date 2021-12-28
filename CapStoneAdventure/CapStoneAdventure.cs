@@ -56,6 +56,24 @@ namespace CapStoneAdventure
                 DataPropertyName = "Quantity"
             });
 
+            dgvQuests.RowHeadersVisible = false;
+            dgvQuests.AutoGenerateColumns = false;
+
+            dgvQuests.DataSource = _player.Quests;
+
+            dgvQuests.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                HeaderText = "Name",
+                Width = 197,
+                DataPropertyName = "Name"
+            });
+
+            dgvQuests.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                HeaderText = "Done?",
+                DataPropertyName = "IsCompleted"
+            });
+
             MoveTo(_player.CurrentLocation);
             
         }
@@ -212,34 +230,13 @@ namespace CapStoneAdventure
                 cboPotions.Visible = false;
                 btnUseWeapon.Visible = false;
                 btnUsePotion.Visible = false;
-            }           
-
-            //refresh quest list
-            UpdateQuestListUI();
+            }
 
             //refresh weapon combobox
             UpdateWeaponListUI();
 
             //refresh potion combobox
             UpdatePotionListUI();
-        }
-        
-
-        private void UpdateQuestListUI()
-        {
-            dgvQuests.RowHeadersVisible = false;
-
-            dgvQuests.ColumnCount = 2;
-            dgvQuests.Columns[0].Name = "Name";
-            dgvQuests.Columns[0].Width = 197;
-            dgvQuests.Columns[1].Name = "Done?";
-
-            dgvQuests.Rows.Clear();
-
-            foreach (PlayerQuest playerQuest in _player.Quests)
-            {
-                dgvQuests.Rows.Add(new[] { playerQuest.Details.Name, playerQuest.IsCompleted.ToString() });
-            }
         }
 
         private void UpdateWeaponListUI()
