@@ -74,6 +74,23 @@ namespace CapStoneAdventure
                 DataPropertyName = "IsCompleted"
             });
 
+            cboWeapons.DataSource = _player.Weapons;
+            cboWeapons.DisplayMember = "Name";
+            cboWeapons.ValueMember = "Id";
+
+            if(_player.CurrentWeapon != null)
+            {
+                cboWeapons.SelectedItem = _player.CurrentWeapon;
+            }
+
+            cboWeapons.SelectedIndexChanged += cboWeapons_SelectedIndexChanged;
+
+            cboPotions.DataSource = _player.Potions;
+            cboPotions.DisplayMember = "Name";
+            cboPotions.ValueMember = "Id";
+
+            _player.PropertyChanged += PlayerOnPropertyChanged;
+
             MoveTo(_player.CurrentLocation);
             
         }
@@ -226,86 +243,15 @@ namespace CapStoneAdventure
             {
                 _currentMonster = null;
 
-                cboWeapons.Visible = false;
-                cboPotions.Visible = false;
-                btnUseWeapon.Visible = false;
-                btnUsePotion.Visible = false;
-            }
+                cboWeapons.Visible = _player.Weapons.Any();
+                cboPotions.Visible = _player.Potions.Any();
+                btnUseWeapon.Visible = _player.Weapons.Any();
+                btnUsePotion.Visible = _player.Potions.Any();
 
-            //refresh weapon combobox
-            UpdateWeaponListUI();
-
-            //refresh potion combobox
-            UpdatePotionListUI();
-        }
-
-        private void UpdateWeaponListUI()
-        {
-            List<Weapon> weapons = new List<Weapon>();
-            foreach (InventoryItem invItem in _player.Inventory)
-            {
-                if (invItem.Details is Weapon)
-                {
-                    if (invItem.Quantity > 0)
-                    {
-                        weapons.Add((Weapon)invItem.Details);
-                    }
-                }
-            }
-
-            if (weapons.Count == 0)
-            {
-                //if there are no weapons then hide weapon display
-                cboWeapons.Visible = false;
-                btnUseWeapon.Visible = false;
-            }
-            else
-            {
-                cboWeapons.SelectedIndexChanged -= cboWeapons_SelectedIndexChanged;
-                cboWeapons.DataSource = weapons;
-                cboWeapons.SelectedIndexChanged += cboWeapons_SelectedIndexChanged;
-                cboWeapons.DisplayMember = "Name";
-                cboWeapons.ValueMember = "ID";
-
-                if (_player.CurrentWeapon != null)
-                {
-                    cboWeapons.SelectedItem = _player.CurrentWeapon;
-                }
-                else
-                {
-                    cboWeapons.SelectedIndex = 0;
-                }
             }
         }
 
-        private void UpdatePotionListUI()
-        {
-            List<HealingPotion> healingPotions = new List<HealingPotion>();
-
-            foreach (InventoryItem invItem in _player.Inventory)
-            {
-                if (invItem.Details is HealingPotion)
-                {
-                    if (invItem.Quantity > 0)
-                    {
-                        healingPotions.Add((HealingPotion)invItem.Details);
-                    }
-                }
-            }
-
-            if (healingPotions.Count == 0)
-            {
-                cboPotions.Visible = false;
-                btnUsePotion.Visible = false;
-            }
-            else
-            {
-                cboPotions.DataSource = healingPotions;
-                cboPotions.DisplayMember = "Name";
-                cboPotions.ValueMember = "ID";
-                cboPotions.SelectedIndex = 0;
-            }
-        }
+        
 
         private void btnUseWeapon_Click(object sender, EventArgs e)
         {
@@ -372,11 +318,8 @@ namespace CapStoneAdventure
                     {
                         rtbMessages.Text += "You loot " + inventoryItem.Quantity.ToString() + " " + inventoryItem.Details.NamePlural + Environment.NewLine;
                     }
-                }                
+                }
                 
-                UpdateWeaponListUI();
-                UpdatePotionListUI();
-
                 rtbMessages.Text += Environment.NewLine;
                 ScrollToBottom();
                 MoveTo(_player.CurrentLocation);
@@ -412,14 +355,7 @@ namespace CapStoneAdventure
             }
 
             //remove the used potion
-            foreach(InventoryItem ii in _player.Inventory)
-            {
-                if(ii.Details.ID == potion.ID)
-                {
-                    ii.Quantity--;
-                    break;
-                }
-            }
+            _player.RemoveItemFromInventory(potion, 1);
 
             rtbMessages.Text += "You drink a " + potion.Name + Environment.NewLine;
 
@@ -433,16 +369,35 @@ namespace CapStoneAdventure
                 MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
             }
             ScrollToBottom();
-
-            //refresh player data in UI                        
-            UpdatePotionListUI();
         }
 
         private void ScrollToBottom()
         {
             rtbMessages.SelectionStart = rtbMessages.Text.Length;
             rtbMessages.ScrollToCaret();
-        }       
+        }
+        
+        private void PlayerOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+        {
+            if(propertyChangedEventArgs.PropertyName == "Weapons")
+            {
+                cboWeapons.DataSource = _player.Weapons;
+                if (!_player.Weapons.Any())
+                {
+                    cboWeapons.Visible = false;
+                    btnUseWeapon.Visible = false;
+                }
+            }
+            if(propertyChangedEventArgs.PropertyName == "Potions")
+            {
+                cboPotions.DataSource = _player.Potions;
+                if (!_player.Potions.Any())
+                {
+                    cboPotions.Visible = false;
+                    btnUsePotion.Visible = false;
+                }
+            }
+        }
 
         private void CapStoneAdventure_FormClosing(object sender, FormClosingEventArgs e)
         {

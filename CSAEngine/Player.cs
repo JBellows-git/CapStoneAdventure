@@ -63,6 +63,14 @@ namespace CSAEngine
         public Location CurrentLocation { get; set; }
         public BindingList<InventoryItem> Inventory { get; set; }
         public BindingList<PlayerQuest> Quests { get; set; }
+        public List<Weapon> Weapons
+        {
+            get { return Inventory.Where(x => x.Details is Weapon).Select(x => x.Details as Weapon).ToList(); }
+        }
+        public List<HealingPotion> Potions
+        {
+            get { return Inventory.Where(x => x.Details is HealingPotion).Select(x => x.Details as HealingPotion).ToList(); }
+        }
 
         private Player(int currentHitPoints, int maximumHitPoints, int gold, int experiencePoints, int expNeededToLevel, int level) : base(currentHitPoints, maximumHitPoints)
         {            
@@ -188,7 +196,7 @@ namespace CSAEngine
 
                 if(item != null)
                 {
-                    item.Quantity -= qci.Quantity;
+                    RemoveItemFromInventory(item.Details, qci.Quantity);
                 }
             }
         }
@@ -204,6 +212,7 @@ namespace CSAEngine
             {
                 item.Quantity++;
             }
+            RaiseInventoryChangedEvent(itemToAdd);
         }
 
         public void MarkQuestCompleted(Quest quest)
@@ -221,6 +230,43 @@ namespace CSAEngine
             Level++;
             ExpNeededToLevel = expNeededToLevel + (Level * 100);            
             MaximumHitPoints += RandomNumberGenerator.NumberBetween((1 * Level), (5 * Level));            
+        }
+
+        private void RaiseInventoryChangedEvent(Item item)
+        {
+            if(item is Weapon)
+            {
+                OnPropertyChanged("Weapons");
+            }
+            if(item is HealingPotion)
+            {
+                OnPropertyChanged("Potions");
+            }
+        }
+
+        public void RemoveItemFromInventory(Item itemToRemove, int quantity = 1)
+        {
+            InventoryItem item = Inventory.SingleOrDefault(ii => ii.Details.ID == itemToRemove.ID);
+
+            if(item == null)
+            {
+                //do nothing, maybe throw an error
+            }
+            else
+            {
+                item.Quantity -= quantity;
+
+                if(item.Quantity < 0)
+                {
+                    item.Quantity = 0;
+                }
+
+                if(item.Quantity == 0)
+                {
+                    Inventory.Remove(item);
+                }
+                RaiseInventoryChangedEvent(itemToRemove);
+            }
         }
 
         public string ToXmlString()
