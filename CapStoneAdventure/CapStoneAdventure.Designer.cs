@@ -52,6 +52,7 @@ namespace CapStoneAdventure
             this.dgvQuests = new System.Windows.Forms.DataGridView();
             this.label6 = new System.Windows.Forms.Label();
             this.lblExperienceNeededToLevel = new System.Windows.Forms.Label();
+            this.btnTrade = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvInventory)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvQuests)).BeginInit();
             this.SuspendLayout();
@@ -278,12 +279,23 @@ namespace CapStoneAdventure
             this.lblExperienceNeededToLevel.Name = "lblExperienceNeededToLevel";
             this.lblExperienceNeededToLevel.Size = new System.Drawing.Size(0, 13);
             this.lblExperienceNeededToLevel.TabIndex = 22;
+            //
+            //btnTrade
+            //
+            this.btnTrade.Location = new System.Drawing.Point(493, 620);
+            this.btnTrade.Name = "btnTrade";
+            this.btnTrade.Size = new System.Drawing.Size(75, 23);
+            this.btnTrade.TabIndex = 22;
+            this.btnTrade.Text = "Trade";
+            this.btnTrade.UseVisualStyleBackColor = true;
+            this.btnTrade.Click += new System.EventHandler(this.btnTrade_Click);
             // 
             // CapStoneAdventure
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(719, 651);
+            this.Controls.Add(this.btnTrade);
             this.Controls.Add(this.lblExperienceNeededToLevel);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.dgvQuests);
@@ -342,6 +354,7 @@ namespace CapStoneAdventure
         private System.Windows.Forms.DataGridView dgvQuests;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label lblExperienceNeededToLevel;
+        private System.Windows.Forms.Button btnTrade;
     }
 }
 
